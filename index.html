@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini Google: 1997 vs 1998</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Main Header & Hero -->
+  <header class="app-header">
+    <div class="header-top">
+      <div class="header-actions">
+        <button id="btn-run-surfer" class="btn btn-accent" title="Simulate 50,000 steps of a random web surfer">
+          <span class="icon">🎲</span> Run the surfer again
+        </button>
+        <button id="btn-toggle-settings" class="btn btn-secondary" aria-expanded="false" aria-controls="settings-panel">
+          <span class="icon">⚙️</span> Settings &amp; Weights
+        </button>
+        <button id="btn-open-modal" class="btn btn-secondary" aria-haspopup="dialog">
+          <span class="icon">📖</span> How It Works
+        </button>
+      </div>
+    </div>
+
+    <div class="hero-brand">
+      <h1 class="logo-text" aria-label="Mini Google: 1997 vs 1998">
+        <span class="letter-g-blue">M</span><span class="letter-o-red">i</span><span class="letter-o-yellow">n</span><span class="letter-g-blue">i</span>
+        <span class="logo-space"></span>
+        <span class="letter-g-blue">G</span><span class="letter-o-red">o</span><span class="letter-o-yellow">o</span><span class="letter-g-blue">g</span><span class="letter-l-green">l</span><span class="letter-e-red">e</span>
+        <span class="logo-tag">1997 vs 1998</span>
+      </h1>
+      <p class="hero-tagline">
+        The birth of <strong>PageRank</strong> &amp; the algorithmic defeat of <strong>Keyword Stuffing</strong>
+      </p>
+    </div>
+
+    <!-- Search Form -->
+    <div class="search-container">
+      <form id="search-form" class="search-form" role="search" onsubmit="event.preventDefault();">
+        <div class="search-input-wrapper">
+          <span class="search-icon" aria-hidden="true">🔍</span>
+          <input 
+            type="text" 
+            id="search-input" 
+            class="search-input" 
+            placeholder="Search our 36-page web graph (e.g. 'best camera')..." 
+            autocomplete="off"
+            spellcheck="false"
+            aria-label="Search query"
+          >
+          <button type="button" id="btn-clear-search" class="btn-clear" aria-label="Clear search" title="Clear search">✕</button>
+        </div>
+        <div class="search-buttons-row">
+          <button type="submit" id="btn-search" class="btn btn-primary">Search</button>
+          <button type="button" id="btn-feeling-lucky" class="btn btn-secondary" title="Search with top demo query">Demo: "best camera"</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Mode Selector -->
+    <div class="mode-selector-wrapper" role="region" aria-label="Ranking Mode Selection">
+      <div class="mode-selector" role="tablist">
+        <button type="button" role="tab" id="tab-1997" class="mode-tab" aria-selected="false" data-mode="1997">
+          <span class="tab-year">1997</span>
+          <span class="tab-label">Text Relevance Only</span>
+        </button>
+        <button type="button" role="tab" id="tab-1998" class="mode-tab" aria-selected="false" data-mode="1998">
+          <span class="tab-year">1998</span>
+          <span class="tab-label">PageRank + Anchor Text</span>
+        </button>
+        <button type="button" role="tab" id="tab-compare" class="mode-tab active" aria-selected="true" data-mode="compare">
+          <span class="tab-year">⚔️ Compare</span>
+          <span class="tab-label">Side-by-Side</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Preset Demo Queries -->
+    <div class="presets-row" aria-label="Preset Demo Queries">
+      <span class="presets-label">Preset Queries:</span>
+      <div class="presets-buttons">
+        <button type="button" class="preset-btn featured" data-query="best camera">
+          📷 best camera <span class="badge-featured">Spam Test</span>
+        </button>
+        <button type="button" class="preset-btn" data-query="learn programming">
+          💻 learn programming
+        </button>
+        <button type="button" class="preset-btn" data-query="healthy recipes">
+          🥗 healthy recipes
+        </button>
+        <button type="button" class="preset-btn" data-query="space exploration">
+          🚀 space exploration
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Notification Toast -->
+  <div id="toast-notification" class="toast-notification hidden" role="status" aria-live="polite"></div>
+
+  <!-- Settings Panel (Collapsible) -->
+  <section id="settings-panel" class="settings-panel hidden" aria-label="Algorithm Settings">
+    <div class="settings-content">
+      <div class="settings-header">
+        <h2 class="settings-title">⚙️ Ranking Parameters &amp; PageRank Controls</h2>
+        <button type="button" id="btn-close-settings" class="btn-icon" aria-label="Close settings">✕</button>
+      </div>
+      <p class="settings-description">
+        Adjust the PageRank damping factor and composite weightings. Any changes will immediately recalculate graph scores and search rankings.
+      </p>
+
+      <div class="settings-grid">
+        <!-- Damping Factor Slider -->
+        <div class="setting-item">
+          <div class="setting-labels">
+            <label for="slider-damping">Damping Factor (<em>d</em>):</label>
+            <span id="val-damping" class="setting-value">0.85</span>
+          </div>
+          <input type="range" id="slider-damping" min="0" max="1" step="0.05" value="0.85">
+          <small class="setting-hint">Probability a surfer follows a link rather than jumping randomly (default: 0.85).</small>
+        </div>
+
+        <!-- Text Relevance Weight Slider -->
+        <div class="setting-item">
+          <div class="setting-labels">
+            <label for="slider-text-weight">1998 Text Weight (<em>w<sub>text</sub></em>):</label>
+            <span id="val-text-weight" class="setting-value">0.55</span>
+          </div>
+          <input type="range" id="slider-text-weight" min="0" max="1" step="0.05" value="0.55">
+          <small class="setting-hint">Weight assigned to on-page keyword frequency &amp; title matches (default: 0.55).</small>
+        </div>
+
+        <!-- PageRank Weight Slider -->
+        <div class="setting-item">
+          <div class="setting-labels">
+            <label for="slider-pr-weight">1998 PageRank Weight (<em>w<sub>pr</sub></em>):</label>
+            <span id="val-pr-weight" class="setting-value">0.35</span>
+          </div>
+          <input type="range" id="slider-pr-weight" min="0" max="1" step="0.05" value="0.35">
+          <small class="setting-hint">Weight assigned to link authority &amp; inbound backlink prestige (default: 0.35).</small>
+        </div>
+
+        <!-- Anchor Text Weight Slider -->
+        <div class="setting-item">
+          <div class="setting-labels">
+            <label for="slider-anchor-weight">1998 Anchor Text Weight (<em>w<sub>anchor</sub></em>):</label>
+            <span id="val-anchor-weight" class="setting-value">0.10</span>
+          </div>
+          <input type="range" id="slider-anchor-weight" min="0" max="1" step="0.05" value="0.10">
+          <small class="setting-hint">Weight assigned to keywords appearing in inbound clickable links (default: 0.10).</small>
+        </div>
+      </div>
+
+      <div class="settings-footer">
+        <div class="weight-sum-indicator">
+          <span>Weights Sum: </span>
+          <strong id="weight-sum-val">1.00</strong>
+          <span id="weight-sum-status" class="status-valid">✓ Balanced</span>
+        </div>
+        <button type="button" id="btn-reset-settings" class="btn btn-secondary">
+          Reset to Defaults
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main App Layout -->
+  <main class="main-layout">
+    <!-- Network Graph Section -->
+    <section class="graph-section" aria-label="Web Hyperlink Graph Visualization">
+      <div class="section-card graph-card">
+        <div class="card-header graph-card-header">
+          <div>
+            <h2 class="card-title">🌐 Web Hyperlink Graph &amp; PageRank Topology</h2>
+            <p class="card-subtitle">36 synthetic pages. Node size indicates PageRank. Arrows depict hyperlink citation flow.</p>
+          </div>
+          <div class="graph-toolbar">
+            <button type="button" id="btn-run-surfer-graph" class="btn btn-secondary btn-sm" title="Re-simulate random surfer walk">
+              <span>🎲</span> Run Surfer Again
+            </button>
+            <button type="button" id="btn-zoom-in" class="btn-icon" title="Zoom in" aria-label="Zoom in">➕</button>
+            <button type="button" id="btn-zoom-out" class="btn-icon" title="Zoom out" aria-label="Zoom out">➖</button>
+            <button type="button" id="btn-reset-graph" class="btn-icon" title="Reset layout" aria-label="Reset layout">🔄</button>
+          </div>
+        </div>
+
+        <div class="graph-canvas-container" id="graph-container">
+          <canvas id="network-canvas" width="800" height="420"></canvas>
+          
+          <!-- Node Inspector Floating Tooltip / Card -->
+          <div id="graph-inspector" class="graph-inspector hidden" role="region" aria-label="Selected Page Details">
+            <div class="inspector-header">
+              <span id="inspector-badge" class="inspector-badge">Authority</span>
+              <button type="button" id="btn-close-inspector" class="btn-close-small" aria-label="Close inspector">✕</button>
+            </div>
+            <h3 id="inspector-title" class="inspector-title">Page Title</h3>
+            <p id="inspector-url" class="inspector-url">http://example.com</p>
+            <div class="inspector-stats">
+              <div class="stat-box">
+                <span class="stat-label">PageRank</span>
+                <span id="inspector-pr" class="stat-value">0.850</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">Inbound Links</span>
+                <span id="inspector-inlinks" class="stat-value">9</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">Outbound</span>
+                <span id="inspector-outlinks" class="stat-value">4</span>
+              </div>
+            </div>
+            <div id="inspector-inbound-list" class="inspector-links-list">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Graph Legend -->
+        <div class="graph-legend">
+          <div class="legend-item">
+            <span class="legend-dot dot-authority"></span>
+            <span>Authority Hubs (High PageRank)</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot dot-normal"></span>
+            <span>Normal Web Pages</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot dot-spam"></span>
+            <span>Keyword Spam Pages (Low PageRank)</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot dot-result"></span>
+            <span>Query Match (Search Highlight)</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-arrow">➔</span>
+            <span>Directed Hyperlink</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Search Results Section -->
+    <section class="results-section" aria-label="Search Results">
+      <div id="results-status" class="results-meta-bar" role="status" aria-live="polite">
+        <!-- Rendered via JS: Query count and active mode -->
+      </div>
+
+      <!-- Container for Results: either single mode or compare mode side-by-side -->
+      <div id="results-display-container" class="results-display-container">
+        <!-- JS renders cards here -->
+      </div>
+    </section>
+
+    <!-- Explanation Panel -->
+    <section class="explanation-section" aria-label="Why are these results different?">
+      <div class="section-card explanation-card">
+        <div class="card-header">
+          <h2 class="card-title">💡 Why Are These Results Different?</h2>
+          <span class="explanation-badge">Key Takeaway</span>
+        </div>
+        <div class="explanation-body">
+          <div class="explanation-grid">
+            <div class="explanation-col col-1997">
+              <h3 class="col-title">1997 Search Engines (AltaVista, Lycos, Yahoo)</h3>
+              <p>
+                In 1997, search engines ranked pages primarily by <strong>what the page said about itself</strong>. They relied on word frequency, title tags, metadata, and exact phrase occurrences.
+              </p>
+              <ul class="explanation-list">
+                <li>❌ <strong>Vulnerable to keyword stuffing:</strong> A spammer could repeat "best camera" 20 times in white text on a white background to snatch the #1 ranking.</li>
+                <li>❌ <strong>No trust verification:</strong> The engine had no way of knowing whether real humans trusted or valued the page.</li>
+                <li>❌ <strong>Manipulable metadata:</strong> Commercial webmasters gamed meta keywords and title repeats effortlessly.</li>
+              </ul>
+            </div>
+
+            <div class="explanation-col col-1998">
+              <h3 class="col-title">1998 Google (Larry Page &amp; Sergey Brin)</h3>
+              <p>
+                In 1998, Google revolutionized the web by ranking pages according to <strong>what other pages said about them</strong> through hyperlinks and anchor text.
+              </p>
+              <ul class="explanation-list">
+                <li>✅ <strong>Links as democratic votes:</strong> Every inbound link is a citation endorsing the destination page.</li>
+                <li>✅ <strong>Recursive prestige:</strong> Links from authoritative pages (like Stanford University or recognized testing labs) carry far more weight than links from obscure blogs or spam rings.</li>
+                <li>✅ <strong>Anchor text context:</strong> Clickable link text (e.g., <em>"recommended best camera"</em>) provides unbiased third-party descriptions of the target page.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div id="dynamic-query-insight" class="dynamic-query-insight">
+            <!-- Dynamic insight rendered via JS based on current search -->
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- How It Works Modal -->
+  <div id="modal-backdrop" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h2 id="modal-title" class="modal-title">Algorithmic Breakdown: 1997 vs 1998</h2>
+        <button type="button" id="btn-close-modal" class="btn-icon" aria-label="Close modal">✕</button>
+      </div>
+      <div class="modal-content">
+        <!-- Tab navigation inside modal -->
+        <div class="modal-section">
+          <h3>1. 1997 Text Relevance Algorithm (TF-IDF &amp; Keyword Matching)</h3>
+          <p>
+            Early search engines used Information Retrieval (IR) models inspired by library catalogs. The engine computes a score purely from document text tokens:
+          </p>
+          <div class="code-formula">
+            Score<sub>1997</sub> = (ExactPhraseBonus) + (w<sub>title</sub> · TitleMatches) + (w<sub>tags</sub> · TagMatches) + (w<sub>url</sub> · URLMatches) + (w<sub>body</sub> · TermFreq)
+          </div>
+          <p>
+            Because the algorithm does not inspect backlinks, any page that maximizes term frequency naturally dominates the top results. This led to rampant "keyword stuffing" across the early web.
+          </p>
+        </div>
+
+        <div class="modal-section">
+          <h3>2. 1998 Google PageRank Algorithm</h3>
+          <p>
+            Developed at Stanford by Larry Page and Sergey Brin, PageRank models a <strong>"Random Web Surfer"</strong> who navigates links at random, occasionally jumping to an arbitrary page with probability <code>(1 - d)</code>.
+          </p>
+          <div class="code-formula">
+            PR(A) = (1 - d) + d · &sum;<sub>T<sub>i</sub> &rarr; A</sub> [ PR(T<sub>i</sub>) / C(T<sub>i</sub>) ]
+          </div>
+          <ul class="modal-list">
+            <li><strong>A:</strong> The target web page.</li>
+            <li><strong>T<sub>i</sub>:</strong> Any page with an outbound hyperlink pointing to A.</li>
+            <li><strong>C(T<sub>i</sub>):</strong> The total number of outbound links leaving page T<sub>i</sub>.</li>
+            <li><strong>d:</strong> The damping factor (default <code>0.85</code>).</li>
+            <li><strong>Dead-End Handling:</strong> Pages with zero outbound links have their PageRank distributed equally across all pages in the corpus to avoid absorbing all probability mass.</li>
+          </ul>
+        </div>
+
+        <div class="modal-section">
+          <h3>3. 1998 Google Composite Final Score</h3>
+          <p>
+            Google did not rank by PageRank alone—it combined on-page textual relevance, link graph authority, and anchor-text intelligence:
+          </p>
+          <div class="code-formula">
+            FinalScore = (0.55 · NormalizedTextScore) + (0.35 · NormalizedPageRank) + (0.10 · NormalizedAnchorScore)
+          </div>
+          <p>
+            This hybrid approach guarantees that a page must be both <em>topically relevant</em> to the search query and <em>vouched for</em> by the broader web ecosystem.
+          </p>
+        </div>
+
+        <div class="modal-section">
+          <h3>4. Why Spam Pages Win in 1997 but Lose in 1998</h3>
+          <table class="modal-comparison-table">
+            <thead>
+              <tr>
+                <th>Factor</th>
+                <th>1997 Search Engine</th>
+                <th>1998 Google</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Keyword Stuffing</strong></td>
+                <td><span class="tag-danger">Rewarded</span> (High term frequency boosts rank to #1)</td>
+                <td><span class="tag-success">Defeated</span> (Links are required to establish trust)</td>
+              </tr>
+              <tr>
+                <td><strong>Backlink Graph</strong></td>
+                <td>Ignored completely</td>
+                <td>Hyperlinks treated as weighted democratic citations</td>
+              </tr>
+              <tr>
+                <td><strong>Anchor Text</strong></td>
+                <td>Ignored completely</td>
+                <td>Inspects what external webmasters write when linking to the page</td>
+              </tr>
+              <tr>
+                <td><strong>Spam Resistance</strong></td>
+                <td>Low (cheap text manipulation)</td>
+                <td>High (expensive &amp; difficult to forge thousands of authoritative links)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="btn-modal-got-it" class="btn btn-primary">Got it, Let's Explore!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <p>
+      <strong>Mini Google: 1997 vs 1998</strong> &bull; Pure HTML5, CSS3, &amp; Vanilla JavaScript &bull; No frameworks, no external libraries.
+    </p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
